@@ -25,13 +25,13 @@ const LandingPage = () => {
   return <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b border-gray-200 py-4">
-        <div className="max-w-7xl mx-auto px-8">
+        <div className="max-w-7xl mx-auto px-6">
           <img src={vfsLogo} alt="VFS Global" className="w-[148.77px] h-[48px]" />
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-8 py-12">
+      <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Section */}
           <div className="lg:col-span-1">
