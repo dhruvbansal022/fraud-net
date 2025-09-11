@@ -38,9 +38,9 @@ const LandingPage = () => {
             <h1 className="text-xl font-bold text-gray-900 mb-6 leading-tight">Document verification for seamless Visa processing in Malta</h1>
             
             <div className="space-y-6 text-gray-600 leading-relaxed">
-              <p>To ensure a seamless Visa processing experience and reduce the risk of financial discrepancies, VFS Global requires applicants to verify their documents. This step guarantees timely and accurate financial transactions related to your Visa application.</p>
+              <p className="text-justify">To ensure a seamless Visa processing experience and reduce the risk of discrepancies, VFS Global requires applicants to verify their documents.</p>
               
-              <p>
+              <p className="text-justify">
                 VFS Global partners with{' '}
                 <a href="https://diro.io/" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium underline hover:no-underline">DIRO</a>{' '}
                 for this process, the leading provider of bank verification solutions trusted by F500 and Tier 1 global banks. Visit DIRO{' '}
@@ -74,7 +74,7 @@ const LandingPage = () => {
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">
                     Enter your URN
                   </h2>
-                  <p className="text-gray-600 text-sm mb-6">
+                  <p className="text-gray-600 text-sm mb-6 text-justify">
                     Please enter your Unique Reference Number (URN) to proceed with the verification process.
                   </p>
                   
@@ -82,9 +82,7 @@ const LandingPage = () => {
                     <Input type="text" placeholder="Enter your URN" value={urn} onChange={e => setUrn(e.target.value)} className="w-full" />
                     <Button onClick={handleVerifyNow} className="w-full bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-medium" style={{
                   backgroundColor: '#1A407A'
-                }}>
-                      Verify Now
-                    </Button>
+                }}>Verify now</Button>
                   </div>
                 </div>
               </div> : <div className="w-full max-w-md">
