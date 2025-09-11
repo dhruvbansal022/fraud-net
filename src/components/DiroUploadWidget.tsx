@@ -328,7 +328,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
                       : 'opacity-0 transform -translate-y-2 pointer-events-none'
                   }`}>
                     <span className="font-semibold text-foreground text-center">
-                      {field.name === 'Account number' ? '****1234' : 'Jan 1–Jun 30, 2024'}
+                      {field.name === 'Account number' ? '****1086' : 'Apr 1–Jun 30, 2025'}
                     </span>
                   </div>
                 )}
