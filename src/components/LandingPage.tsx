@@ -24,8 +24,8 @@ const LandingPage = () => {
   };
   return <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-gray-200 py-4 px-8">
-        <div className="max-w-7xl mx-auto">
+      <header className="border-b border-gray-200 py-4">
+        <div className="max-w-7xl mx-auto px-8">
           <img src={vfsLogo} alt="VFS Global" className="w-[148.77px] h-[48px]" />
         </div>
       </header>
