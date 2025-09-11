@@ -1,18 +1,8 @@
-import React, { useState } from 'react';
-import { ChevronDown, Plus } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import DiroUploadWidget from './DiroUploadWidget';
 import vfsLogo from '../assets/vfs-logo.png';
 const LandingPage = () => {
-  const [showUploadWidget, setShowUploadWidget] = useState(false);
-  const [urn, setUrn] = useState('');
-  const handleVerifyNow = () => {
-    if (urn.trim()) {
-      setShowUploadWidget(true);
-    }
-  };
   const handleFileUpload = (file: File) => {
     console.log('File uploaded:', file.name);
   };
@@ -69,25 +59,9 @@ const LandingPage = () => {
 
           {/* Center Section - Widget */}
           <div className="lg:col-span-1 flex justify-center">
-            {!showUploadWidget ? <div className="w-full max-w-md">
-                <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                    Enter your URN
-                  </h2>
-                  <p className="text-gray-600 text-sm mb-6 text-justify">
-                    Please enter your Unique Reference Number (URN) to proceed with the verification process.
-                  </p>
-                  
-                  <div className="space-y-4">
-                    <Input type="text" placeholder="Enter your URN" value={urn} onChange={e => setUrn(e.target.value)} className="w-full" />
-                    <Button onClick={handleVerifyNow} className="w-full bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-medium" style={{
-                  backgroundColor: '#1A407A'
-                }}>Proceed</Button>
-                  </div>
-                </div>
-              </div> : <div className="w-full max-w-md">
-                <DiroUploadWidget onFileUpload={handleFileUpload} onRetry={handleRetry} onSubmit={handleSubmit} documentType="bank statement" periodRange="last 3 months" />
-              </div>}
+            <div className="w-full max-w-md">
+              <DiroUploadWidget onFileUpload={handleFileUpload} onRetry={handleRetry} onSubmit={handleSubmit} documentType="bank statement" periodRange="last 3 months" />
+            </div>
           </div>
 
           {/* Right Section - FAQs */}
