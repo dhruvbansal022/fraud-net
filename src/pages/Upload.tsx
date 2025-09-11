@@ -38,9 +38,9 @@ const Upload = () => {
 
       {/* Main Content */}
       <main className="mx-auto px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Section */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 lg:max-w-lg">
             <h1 className="text-xl font-bold text-gray-900 mb-6 leading-tight">Document verification for seamless Visa processing in Malta</h1>
             
             <div className="space-y-6 text-gray-600 leading-relaxed">
@@ -73,8 +73,8 @@ const Upload = () => {
             </div>
           </div>
 
-          {/* Right Section - Widget (shifted to the right) */}
-          <div className="lg:col-span-1 flex justify-center lg:justify-end">
+          {/* Right Section - Widget (positioned center-right) */}
+          <div className="lg:col-span-1 flex justify-center lg:justify-center lg:pl-8">
             {!showUploadWidget ? (
               <div className="w-full max-w-md">
                 <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
