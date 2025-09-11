@@ -82,7 +82,7 @@ const LandingPage = () => {
                     <Input type="text" placeholder="Enter your URN" value={urn} onChange={e => setUrn(e.target.value)} className="w-full" />
                     <Button onClick={handleVerifyNow} className="w-full bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-medium" style={{
                   backgroundColor: '#1A407A'
-                }}>Verify now</Button>
+                }}>Proceed</Button>
                   </div>
                 </div>
               </div> : <div className="w-full max-w-md">
