@@ -13,6 +13,7 @@ export type WidgetState =
   | 'document-verified'
   | 'error' 
   | 'unprocessable'
+  | 'submitting'
   | 'success';
 
 export interface ValidationField {
@@ -192,8 +193,13 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
   };
 
   const handleSubmit = () => {
-    setState('success');
-    onSubmit?.();
+    setState('submitting');
+    
+    // Show loader for 2-3 seconds then show success
+    setTimeout(() => {
+      setState('success');
+      onSubmit?.();
+    }, 2500);
   };
 
   const renderUploadState = () => (
@@ -459,6 +465,16 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
     </div>
   );
 
+  const renderSubmittingState = () => (
+    <div className="text-center">
+      <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-primary" />
+      <h3 className="text-lg font-semibold mb-2">Submitting...</h3>
+      <p className="text-sm text-muted-foreground">
+        Processing your submission
+      </p>
+    </div>
+  );
+
   const renderSuccessState = () => (
     <div className="text-center">
       <CheckCircle className="w-[52px] h-[52px] mx-auto mb-4 text-success" />
@@ -484,6 +500,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
         {state === 'document-verified' && renderDocumentVerifiedState()}
         {state === 'error' && renderErrorState()}
         {state === 'unprocessable' && renderUnprocessableState()}
+        {state === 'submitting' && renderSubmittingState()}
         {state === 'success' && renderSuccessState()}
       </div>
       
