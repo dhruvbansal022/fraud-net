@@ -40,7 +40,7 @@ const Upload = () => {
       <main className="mx-auto px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Section */}
-          <div className="lg:col-span-1 lg:max-w-lg">
+          <div className="lg:col-span-1 lg:max-w-md">
             <h1 className="text-xl font-bold text-gray-900 mb-6 leading-tight">Document verification for seamless Visa processing in Malta</h1>
             
             <div className="space-y-6 text-gray-600 leading-relaxed">
