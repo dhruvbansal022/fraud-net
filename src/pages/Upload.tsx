@@ -69,7 +69,7 @@ const Upload = () => {
                 onFileUpload={handleFileUpload} 
                 onRetry={handleRetry} 
                 onSubmit={handleSubmit} 
-                documentType="bank statement" 
+                documentType="document" 
                 periodRange="last 3 months" 
               />
             </div>
