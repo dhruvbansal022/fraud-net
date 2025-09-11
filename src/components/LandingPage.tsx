@@ -5,31 +5,24 @@ import { Input } from './ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import DiroUploadWidget from './DiroUploadWidget';
 import vfsLogo from '../assets/vfs-logo.png';
-
 const LandingPage = () => {
   const [showUploadWidget, setShowUploadWidget] = useState(false);
   const [urn, setUrn] = useState('');
-
   const handleVerifyNow = () => {
     if (urn.trim()) {
       setShowUploadWidget(true);
     }
   };
-
   const handleFileUpload = (file: File) => {
     console.log('File uploaded:', file.name);
   };
-
   const handleRetry = () => {
     console.log('User clicked retry');
   };
-
   const handleSubmit = () => {
     console.log('Form submitted successfully');
   };
-
-  return (
-    <div className="min-h-screen bg-white">
+  return <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b border-gray-200 py-4 px-4">
         <div className="flex items-center">
@@ -42,14 +35,10 @@ const LandingPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Section */}
           <div className="lg:col-span-1">
-            <h1 className="text-xl font-bold text-gray-900 mb-6 leading-tight">
-              Bank account verification for seamless Visa processing in Malta
-            </h1>
+            <h1 className="text-xl font-bold text-gray-900 mb-6 leading-tight">Document verification for seamless Visa processing in Malta</h1>
             
             <div className="space-y-6 text-gray-600 leading-relaxed">
-              <p>
-                To ensure a seamless Visa processing experience and reduce the risk of financial discrepancies, VFS Global requires applicants to verify their bank account statement. This step guarantees timely and accurate financial transactions related to your Visa application.
-              </p>
+              <p>To ensure a seamless Visa processing experience and reduce the risk of financial discrepancies, VFS Global requires applicants to verify their documents. This step guarantees timely and accurate financial transactions related to your Visa application.</p>
               
               <p>
                 VFS Global partners with{' '}
@@ -63,9 +52,7 @@ const LandingPage = () => {
               
               <p>
                 Learn more about DIRO's{' '}
-                <a href="https://diro.io/products/bank-account-verification/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:no-underline">
-                  bank
-                </a>{' '}
+                <a href="https://diro.io/products/bank-account-verification/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:no-underline">document</a>{' '}
                 verification solutions.
               </p>
             </div>
@@ -82,8 +69,7 @@ const LandingPage = () => {
 
           {/* Center Section - Widget */}
           <div className="lg:col-span-1 flex justify-center">
-            {!showUploadWidget ? (
-              <div className="w-full max-w-md">
+            {!showUploadWidget ? <div className="w-full max-w-md">
                 <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">
                     Enter your URN
@@ -93,34 +79,17 @@ const LandingPage = () => {
                   </p>
                   
                   <div className="space-y-4">
-                    <Input
-                      type="text"
-                      placeholder="Enter your URN"
-                      value={urn}
-                      onChange={(e) => setUrn(e.target.value)}
-                      className="w-full"
-                    />
-                    <Button
-                      onClick={handleVerifyNow}
-                      className="w-full bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-medium"
-                      style={{ backgroundColor: '#1A407A' }}
-                    >
+                    <Input type="text" placeholder="Enter your URN" value={urn} onChange={e => setUrn(e.target.value)} className="w-full" />
+                    <Button onClick={handleVerifyNow} className="w-full bg-blue-800 hover:bg-blue-900 text-white py-3 rounded-lg font-medium" style={{
+                  backgroundColor: '#1A407A'
+                }}>
                       Verify Now
                     </Button>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="w-full max-w-md">
-                <DiroUploadWidget
-                  onFileUpload={handleFileUpload}
-                  onRetry={handleRetry}
-                  onSubmit={handleSubmit}
-                  documentType="bank statement"
-                  periodRange="last 3 months"
-                />
-              </div>
-            )}
+              </div> : <div className="w-full max-w-md">
+                <DiroUploadWidget onFileUpload={handleFileUpload} onRetry={handleRetry} onSubmit={handleSubmit} documentType="bank statement" periodRange="last 3 months" />
+              </div>}
           </div>
 
           {/* Right Section - FAQs */}
@@ -210,8 +179,6 @@ const LandingPage = () => {
           </div>
         </div>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default LandingPage;
