@@ -30,14 +30,14 @@ const Upload = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-gray-200 py-4 px-8">
+      <header className="border-b border-gray-200 py-4 px-8 lg:pl-16">
         <div className="flex items-center">
           <img src={vfsLogo} alt="VFS Global" className="w-[148.77px] h-[48px]" />
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto px-8 py-12">
+      <main className="mx-auto px-8 lg:pl-16 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Section */}
           <div className="lg:col-span-1 lg:max-w-md">
