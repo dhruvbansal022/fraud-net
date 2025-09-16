@@ -16,7 +16,7 @@ const LandingPage = () => {
       {/* Header */}
       <header className="border-b border-gray-200 py-4 px-8">
         <div className="flex items-center">
-          <img src={fraudnetLogo} alt="FraudNet" className="w-[171px] h-[48px]" />
+          <img src={fraudnetLogo} alt="FraudNet" className="w-[185px] h-[48px]" />
         </div>
       </header>
 
