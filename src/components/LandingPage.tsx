@@ -1,7 +1,7 @@
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import DiroUploadWidget from './DiroUploadWidget';
-import fraudnetLogo from '../assets/fraudnet-logo-new.png';
+import fraudnetLogo from '../assets/fraudnet-logo-updated.png';
 const LandingPage = () => {
   const handleFileUpload = (file: File) => {
     console.log('File uploaded:', file.name);
