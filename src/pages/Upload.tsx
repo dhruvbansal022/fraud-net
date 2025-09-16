@@ -1,6 +1,6 @@
 import React from 'react';
 import DiroUploadWidget from '@/components/DiroUploadWidget';
-import vfsLogo from '@/assets/vfs-logo.png';
+import fraudnetLogo from '@/assets/fraudnet-logo.png';
 
 const Upload = () => {
 
@@ -21,7 +21,7 @@ const Upload = () => {
       {/* Header */}
       <header className="border-b border-gray-200 py-4 px-8 lg:pl-16">
         <div className="flex items-center">
-          <img src={vfsLogo} alt="VFS Global" className="w-[148.77px] h-[48px]" />
+          <img src={fraudnetLogo} alt="FraudNet" className="w-[148.77px] h-[48px]" />
         </div>
       </header>
 
@@ -30,13 +30,13 @@ const Upload = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Section */}
           <div className="lg:col-span-1 lg:max-w-md">
-            <h1 className="text-xl font-bold text-gray-900 mb-6 leading-tight">Document verification for seamless Visa processing in Malta</h1>
+            <h1 className="text-xl font-bold text-gray-900 mb-6 leading-tight">Document verification for seamless onboarding</h1>
             
             <div className="space-y-6 text-gray-600 leading-relaxed">
-              <p className="text-justify">To ensure a seamless Visa processing experience and reduce the risk of discrepancies, VFS Global requires applicants to verify their documents.</p>
+              <p className="text-justify">To ensure a seamless onboarding experience and reduce the risk of discrepancies, FraudNet requires users to verify their documents.</p>
               
               <p className="text-justify">
-                VFS Global partners with{' '}
+                FraudNet partners with{' '}
                 <a href="https://diro.io/" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium underline hover:no-underline">DIRO</a>{' '}
                 for this process, the leading provider of bank verification solutions trusted by F500 and Tier 1 global banks. Visit DIRO{' '}
                 <a href="https://trust.diro.io/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:no-underline">

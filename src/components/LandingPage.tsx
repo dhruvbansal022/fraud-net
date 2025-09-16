@@ -1,7 +1,7 @@
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import DiroUploadWidget from './DiroUploadWidget';
-import vfsLogo from '../assets/vfs-logo.png';
+import fraudnetLogo from '../assets/fraudnet-logo.png';
 const LandingPage = () => {
   const handleFileUpload = (file: File) => {
     console.log('File uploaded:', file.name);
@@ -16,7 +16,7 @@ const LandingPage = () => {
       {/* Header */}
       <header className="border-b border-gray-200 py-4 px-8">
         <div className="flex items-center">
-          <img src={vfsLogo} alt="VFS Global" className="w-[148.77px] h-[48px]" />
+          <img src={fraudnetLogo} alt="FraudNet" className="w-[148.77px] h-[48px]" />
         </div>
       </header>
 
@@ -25,13 +25,13 @@ const LandingPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Section */}
           <div className="lg:col-span-1">
-            <h1 className="text-xl font-bold text-gray-900 mb-6 leading-tight">Document verification for seamless Visa processing in Malta</h1>
+            <h1 className="text-xl font-bold text-gray-900 mb-6 leading-tight">Document verification for seamless onboarding</h1>
             
             <div className="space-y-6 text-gray-600 leading-relaxed">
-              <p className="text-justify">To ensure a seamless Visa processing experience and reduce the risk of discrepancies, VFS Global requires applicants to verify their documents.</p>
+              <p className="text-justify">To ensure a seamless onboarding experience and reduce the risk of discrepancies, FraudNet requires users to verify their documents.</p>
               
               <p className="text-justify">
-                VFS Global partners with{' '}
+                FraudNet partners with{' '}
                 <a href="https://diro.io/" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium underline hover:no-underline">DIRO</a>{' '}
                 for this process, the leading provider of bank verification solutions trusted by F500 and Tier 1 global banks. Visit DIRO{' '}
                 <a href="https://trust.diro.io/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:no-underline">
@@ -79,7 +79,7 @@ const LandingPage = () => {
                   <ul className="space-y-2">
                     <li className="flex">
                       <span className="mr-2">•</span>
-                      <span>Your uploaded document will not be shared with VFS Global. Only the fields requested, such as name, address, account number and IBAN will be shared. All other data will be purged.</span>
+                      <span>Your uploaded document will not be shared with FraudNet. Only the fields requested, such as name, address, account number and IBAN will be shared. All other data will be purged.</span>
                     </li>
                   </ul>
                 </AccordionContent>
