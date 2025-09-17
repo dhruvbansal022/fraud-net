@@ -1,7 +1,7 @@
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import DiroUploadWidget from './DiroUploadWidget';
-import fraudnetLogo from '../assets/fraudnet-logo-updated.png';
+import fraudnetLogo from '../assets/image (1).png';
 const LandingPage = () => {
   const handleFileUpload = (file: File) => {
     console.log('File uploaded:', file.name);
@@ -16,7 +16,7 @@ const LandingPage = () => {
       {/* Header */}
       <header className="border-b border-gray-200 py-4 px-8">
         <div className="flex items-center">
-          <img src={fraudnetLogo} alt="FraudNet" className="w-[185px] h-[48px]" />
+          <img src={fraudnetLogo} alt="FraudNet" className="h-[48px] w-auto" />
         </div>
       </header>
 
