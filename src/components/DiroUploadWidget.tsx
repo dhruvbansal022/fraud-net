@@ -241,7 +241,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
           Drag and drop your file here.
         </p>
         <Button className="bg-black hover:bg-black/90 text-white rounded-lg px-6 py-2">
-          Browse
+          Choose file
         </Button>
         <p className="text-xs text-muted-foreground mt-4">
           Supports {acceptedFileTypes.join(', ')} • Max {maxFileSize}MB
