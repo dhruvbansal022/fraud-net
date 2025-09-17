@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { parse, format, isValid } from 'date-fns';
 import { CloudUpload, FileText, CheckCircle, XCircle, RefreshCw, AlertCircle, TriangleAlert, Calendar, User, MapPin, CreditCard, Loader2, AlertOctagon } from 'lucide-react';
 import { Button } from './ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { cn } from '@/lib/utils';
 
 export type WidgetState = 
@@ -73,6 +74,10 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
     source: 'Chase Bank Portal'
   });
   const [hoveredField, setHoveredField] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const startTimeRef = useRef<number>(0);
+  const progressTimerRef = useRef<number | null>(null);
+  const apiDoneRef = useRef<boolean>(false);
 
   const validationMessages = [
     "Extracting data…", 
@@ -126,22 +131,54 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
     }
   }, [state]);
 
+  useEffect(() => {
+    return () => {
+      if (progressTimerRef.current) {
+        clearInterval(progressTimerRef.current);
+        progressTimerRef.current = null;
+      }
+    };
+  }, []);
+
   const handleFileSelect = async (file: File) => {
     setUploadedFile(file);
     setState('uploading');
 
+    // Initialize progress timing
+    apiDoneRef.current = false;
+    setProgress(0);
+    startTimeRef.current = Date.now();
+    if (progressTimerRef.current) {
+      clearInterval(progressTimerRef.current);
+      progressTimerRef.current = null;
+    }
+    // Update every 200ms
+    progressTimerRef.current = window.setInterval(() => {
+      const elapsedSec = (Date.now() - startTimeRef.current) / 1000;
+      let target = 0;
+      if (!apiDoneRef.current) {
+        if (elapsedSec <= 10) {
+          // 0 -> 60 in first 10s
+          target = (elapsedSec / 10) * 60;
+        } else if (elapsedSec <= 32) {
+          // 60 -> 99 across next 22s
+          target = 60 + Math.min(39, ((elapsedSec - 10) / 22) * 39);
+        } else {
+          target = 99;
+        }
+      } else {
+        target = 100;
+      }
+      setProgress(prev => {
+        const next = Math.max(prev, Math.floor(target));
+        return next > 100 ? 100 : next;
+      });
+    }, 200);
+
     // Reset message index to start fresh for each upload
     setCurrentMessageIndex(0);
 
-    // Progress transitions while waiting, but don't override a later state
-    setTimeout(() => {
-      setState(prev => (prev === 'uploading' ? 'processing' : prev));
-      setCurrentMessageIndex(0);
-    }, 1000);
-    setTimeout(() => {
-      setState(prev => (prev === 'processing' || prev === 'uploading' ? 'validating' : prev));
-      setCurrentMessageIndex(0);
-    }, 2500);
+    // We drive progress via timer; no state hops needed
 
     try {
       const maybe = onFileUpload?.(file) as unknown;
@@ -177,9 +214,23 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
         }))
       );
 
-      setState('verified');
+      // Mark API done to allow progress to complete to 100
+      apiDoneRef.current = true;
+      setProgress(100);
+      // brief moment to show 100% completed
+      setTimeout(() => {
+        if (progressTimerRef.current) {
+          clearInterval(progressTimerRef.current);
+          progressTimerRef.current = null;
+        }
+        setState('verified');
+      }, 800);
     } catch (e) {
       setState('error');
+      if (progressTimerRef.current) {
+        clearInterval(progressTimerRef.current);
+        progressTimerRef.current = null;
+      }
     }
   };
 
@@ -258,11 +309,21 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
   );
 
   const renderProgressState = () => {
-    const progress = state === 'uploading' ? 30 : state === 'processing' ? 60 : 90;
-    
+    // Message tied to progress thresholds
+    const p = progress;
+    const msg = p >= 100
+      ? 'Completed'
+      : p >= 80
+        ? 'Finalizing validation'
+        : p >= 60
+          ? 'Analyzing content'
+          : p >= 20
+            ? 'Extracting fields'
+            : 'Uploading document';
+
     return (
       <div className="text-center">
-        <h3 className="text-lg font-semibold mb-6">{getDynamicLoaderMessage()}</h3>
+        <h3 className="text-lg font-semibold mb-6">{msg}</h3>
         
         {/* Progress bar with percentage */}
         <div className="mb-2">
@@ -270,17 +331,28 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
             <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
               <div 
                 className="h-full bg-black rounded-full transition-all duration-300 ease-out" 
-                style={{ width: `${progress}%` }}
+                style={{ width: `${p}%` }}
               />
             </div>
-            <span className="text-sm font-medium text-foreground ml-3 min-w-[3rem] text-right">{progress}%</span>
+            <span className="text-sm font-medium text-foreground ml-3 min-w-[3rem] text-right">{p}%</span>
           </div>
         </div>
         
         {uploadedFile && (
-          <div className="bg-progress-background border border-muted rounded-lg p-3 mt-4">
-            <p className="text-sm text-muted-foreground font-medium">{uploadedFile.name}</p>
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="bg-progress-background border border-muted rounded-lg p-3 mt-4 cursor-pointer">
+                  <p className="text-sm text-muted-foreground font-medium truncate">
+                    {uploadedFile.name}
+                  </p>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                {uploadedFile.name}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
       </div>
     );
