@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import DiroUploadWidget from '@/components/DiroUploadWidget';
-import fraudnetLogo from '@/assets/image (1).png';
+import fraudnetLogo from '@/assets/fraudnet-logo-new.png';
 import { uploadSmartFeedback, submitSmartUpload } from '@/services/diro';
 import { env } from '@/config/env';
 // import { toast } from '@/components/ui/use-toast';
