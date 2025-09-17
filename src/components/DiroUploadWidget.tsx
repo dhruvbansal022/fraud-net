@@ -240,7 +240,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
         <p className="text-sm text-muted-foreground mb-6">
           Drag and drop your file here.
         </p>
-        <Button className="bg-black hover:bg-black/90 text-white rounded-lg px-6 py-2">
+        <Button className="rounded-lg px-6 py-2">
           Choose file
         </Button>
         <p className="text-xs text-muted-foreground mt-4">
@@ -374,7 +374,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
           }} className="flex-1">
             Try another
           </Button>
-          <Button onClick={handleSubmit} className="flex-1 bg-black hover:bg-black/90 text-white">
+          <Button onClick={handleSubmit} className="flex-1">
             Submit
           </Button>
         </div>
@@ -392,7 +392,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
         We couldn't complete your request. Please try again.
       </p>
       <div className="flex justify-center">
-        <Button onClick={handleRetry} className="px-6 bg-black hover:bg-black/90 text-white">
+        <Button onClick={handleRetry} className="px-6">
           Try again
         </Button>
       </div>
@@ -425,7 +425,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
       
       {/* Button with consistent styling */}
       <div className="flex justify-center">
-        <Button onClick={handleRetry} className="px-6 bg-black hover:bg-black/90 text-white">
+        <Button onClick={handleRetry} className="px-6">
           Try again
         </Button>
       </div>
