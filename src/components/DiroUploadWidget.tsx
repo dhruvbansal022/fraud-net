@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { parse, format, isValid } from 'date-fns';
 import { CloudUpload, FileText, CheckCircle, XCircle, RefreshCw, AlertCircle, TriangleAlert, Calendar, User, MapPin, CreditCard, Loader2, AlertOctagon } from 'lucide-react';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
@@ -23,10 +24,20 @@ export interface ValidationField {
   required: boolean;
 }
 
+type SmartFeedbackResult = {
+  name?: boolean;
+  address?: boolean;
+  accountnumber?: boolean;
+  accountnumber_value?: string[];
+  period?: string;
+  docid?: string;
+  [key: string]: unknown;
+};
+
 export interface DiroUploadWidgetProps {
-  onFileUpload?: (file: File) => void;
+  onFileUpload?: (file: File) => Promise<SmartFeedbackResult | void> | SmartFeedbackResult | void;
   onRetry?: () => void;
-  onSubmit?: () => void;
+  onSubmit?: () => Promise<void> | void;
   className?: string;
   acceptedFileTypes?: string[];
   maxFileSize?: number;
@@ -54,7 +65,8 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
     { name: 'Account number', icon: null, validated: false, required: true },
     { name: 'Period', icon: null, validated: false, required: true },
   ]);
-  const [scenarioIndex, setScenarioIndex] = useState(0);
+  // Values extracted from API to show in UI badges
+  const [resultValues, setResultValues] = useState<{ accountMasked?: string; period?: string }>({});
   const [verificationDetails, setVerificationDetails] = useState({
     documentId: 'DOC-2024-001234',
     fingerprint: 'SHA256:a1b2c3d4e5f6...',
@@ -67,6 +79,24 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
     "Validating fields…",
     "Finalizing verification…"
   ];
+
+  const formatPeriodRange = (period?: string): string | undefined => {
+    if (!period) return undefined;
+    const parts = period.split('-');
+    if (parts.length !== 2) return period;
+    const start = parse(parts[0].trim(), 'yyyy/MM/dd', new Date());
+    const end = parse(parts[1].trim(), 'yyyy/MM/dd', new Date());
+    if (!isValid(start) || !isValid(end)) return period;
+    const sameYear = start.getFullYear() === end.getFullYear();
+    if (sameYear) {
+      const sameMonth = start.getMonth() === end.getMonth();
+      if (sameMonth) {
+        return `${format(start, 'MMM d')}–${format(end, 'MMM d')}, ${format(start, 'yyyy')}`;
+      }
+      return `${format(start, 'MMM d')}–${format(end, 'MMM d')}, ${format(start, 'yyyy')}`;
+    }
+    return `${format(start, 'MMM d, yyyy')}–${format(end, 'MMM d, yyyy')}`;
+  };
 
   // Dynamic loader messages based on current state
   const getDynamicLoaderMessage = () => {
@@ -96,74 +126,61 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
     }
   }, [state]);
 
-  const handleFileSelect = (file: File) => {
+  const handleFileSelect = async (file: File) => {
     setUploadedFile(file);
-    onFileUpload?.(file);
     setState('uploading');
-    
+
     // Reset message index to start fresh for each upload
     setCurrentMessageIndex(0);
-    
-    // Simulate upload and processing flow with message resets
+
+    // Progress transitions while waiting, but don't override a later state
     setTimeout(() => {
-      setState('processing');
-      setCurrentMessageIndex(0); // Reset for processing state
+      setState(prev => (prev === 'uploading' ? 'processing' : prev));
+      setCurrentMessageIndex(0);
     }, 1000);
     setTimeout(() => {
-      setState('validating');
-      setCurrentMessageIndex(0); // Reset for validating state
+      setState(prev => (prev === 'processing' || prev === 'uploading' ? 'validating' : prev));
+      setCurrentMessageIndex(0);
     }, 2500);
-    setTimeout(() => {
-      // 6 scenarios as requested - corrected order
-      const scenarios = [
-        // Scenario 1: Positive flow - show please review screen with all fields green
-        { type: 'validation', name: true, address: true, account: true, period: true },
-        // Scenario 2: Missing fields - one or two fields missing
-        { type: 'validation', name: false, address: false, account: true, period: true },
-        // Scenario 3: Missing period with error message
-        { type: 'validation', name: true, address: true, account: true, period: false },
-        // Scenario 4: Original document verified successfully screen
-        { type: 'document-verified', name: true, address: true, account: true, period: true },
-        // Scenario 5: Unprocessable image
-        { type: 'unprocessable' },
-        // Scenario 6: Something went wrong
-        { type: 'error' },
-      ];
-      
-      // Get current scenario using the current index (before incrementing)
-      const currentIndex = scenarioIndex % scenarios.length;
-      const currentScenario = scenarios[currentIndex];
-      console.log('Executing Scenario', currentIndex + 1, ':', currentScenario);
-      
-      // Handle different scenario types
-      if (currentScenario.type === 'error') {
-        setState('error');
-      } else if (currentScenario.type === 'unprocessable') {
-        setState('unprocessable');
-      } else if (currentScenario.type === 'document-verified') {
-        // Set all fields as validated for document verified state
-        setValidationFields(fields => 
-          fields.map(field => ({ ...field, validated: true }))
-        );
-        setState('document-verified');
-      } else if (currentScenario.type === 'validation') {
-        // Handle validation scenarios (including positive flow)
-        setValidationFields(fields => 
-          fields.map(field => ({
-            ...field,
-            validated: field.name === 'Name' ? currentScenario.name :
-                      field.name === 'Address' ? currentScenario.address :
-                      field.name === 'Account number' ? currentScenario.account :
-                      field.name === 'Period' ? currentScenario.period :
-                      true
-          }))
-        );
-        setState('verified');
+
+    try {
+      const maybe = onFileUpload?.(file) as unknown;
+      const result: SmartFeedbackResult | void =
+        maybe instanceof Promise ? await maybe : (maybe as SmartFeedbackResult | void);
+      if (!result) {
+        // If no result is returned, do not advance to next screen
+        return;
       }
-      
-      // Increment scenario index AFTER processing the scenario
-      setScenarioIndex(prev => prev + 1);
-    }, 4000);
+
+      const isNameValid = Boolean(result.name);
+      const isAddressValid = Boolean(result.address);
+      const isAccountValid = Boolean(result.accountnumber);
+      const isPeriodValid = Boolean((result.period || '').toString().trim());
+
+      const lastDigits = Array.isArray(result.accountnumber_value) && result.accountnumber_value.length > 0
+        ? String(result.accountnumber_value[0])
+        : undefined;
+      const maskedAccount = lastDigits ? `****${lastDigits}` : undefined;
+
+      const periodFormatted = formatPeriodRange(result.period as string | undefined);
+      setResultValues({ accountMasked: maskedAccount, period: periodFormatted });
+
+      setValidationFields(fields =>
+        fields.map(field => ({
+          ...field,
+          validated:
+            field.name === 'Name' ? isNameValid :
+            field.name === 'Address' ? isAddressValid :
+            field.name === 'Account number' ? isAccountValid :
+            field.name === 'Period' ? isPeriodValid :
+            true,
+        }))
+      );
+
+      setState('verified');
+    } catch (e) {
+      setState('error');
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -192,14 +209,17 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
     onRetry?.();
   };
 
-  const handleSubmit = () => {
-    setState('submitting');
-    
-    // Show loader for 2-3 seconds then show success
-    setTimeout(() => {
+  const handleSubmit = async () => {
+    try {
+      setState('submitting');
+      const result = onSubmit?.();
+      if (result instanceof Promise) {
+        await result;
+      }
       setState('success');
-      onSubmit?.();
-    }, 2500);
+    } catch (e) {
+      setState('error');
+    }
   };
 
   const renderUploadState = () => (
@@ -218,10 +238,10 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
         <CloudUpload className="w-16 h-16 mx-auto mb-6 text-muted-foreground stroke-1" />
         <h3 className="text-lg font-semibold mb-2">Upload your {documentType}</h3>
         <p className="text-sm text-muted-foreground mb-6">
-          Drag and drop your file here, or click to browse
+          Drag and drop your file here.
         </p>
-        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg px-6 py-2">
-          Choose file
+        <Button className="bg-black hover:bg-black/90 text-white rounded-lg px-6 py-2">
+          Browse
         </Button>
         <p className="text-xs text-muted-foreground mt-4">
           Supports {acceptedFileTypes.join(', ')} • Max {maxFileSize}MB
@@ -249,7 +269,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
           <div className="flex justify-between items-center mb-2">
             <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
               <div 
-                className="h-full bg-primary rounded-full transition-all duration-300 ease-out" 
+                className="h-full bg-black rounded-full transition-all duration-300 ease-out" 
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -290,9 +310,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
 
   const renderValidationState = () => {
     const invalidFields = validationFields.filter(field => !field.validated);
-    const allFieldsValid = invalidFields.length === 0;
-    
-    // Always show the "Please review" screen regardless of field validity
+    // Always show the "Please review" screen with API-driven values
     return (
       <div>
         <div className="text-center mb-6">
@@ -334,7 +352,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
                       : 'opacity-0 transform -translate-y-2 pointer-events-none'
                   }`}>
                     <span className="font-semibold text-foreground text-center">
-                      {field.name === 'Account number' ? '****1086' : 'Apr 1–Jun 30, 2025'}
+                      {field.name === 'Account number' ? (resultValues.accountMasked || '—') : (resultValues.period || '—')}
                     </span>
                   </div>
                 )}
@@ -343,21 +361,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
           ))}
         </div>
 
-        {invalidFields.length > 0 && invalidFields.some(field => field.name === 'Period') && (
-          <div className="bg-error/10 border border-error/20 rounded-lg p-3 mb-6 shadow-sm">
-            <p className="text-sm text-error">
-              14 days missing. Please upload Jan 1 to Jun 30, 2024 statement.
-            </p>
-          </div>
-        )}
-
-        {invalidFields.length > 0 && invalidFields.some(field => field.name === 'Name') && invalidFields.some(field => field.name === 'Address') && (
-          <div className="bg-error/10 border border-error/20 rounded-lg p-3 mb-6 shadow-sm">
-            <p className="text-sm text-error">
-              Name and address is missing.
-            </p>
-          </div>
-        )}
+        {/* Intentionally removing hardcoded warnings; rely on API-driven booleans above */}
 
         <div className="flex gap-3">
           <Button variant="outline" onClick={() => {
@@ -370,7 +374,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
           }} className="flex-1">
             Try another
           </Button>
-          <Button onClick={handleSubmit} className="flex-1">
+          <Button onClick={handleSubmit} className="flex-1 bg-black hover:bg-black/90 text-white">
             Submit
           </Button>
         </div>
@@ -388,7 +392,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
         We couldn't complete your request. Please try again.
       </p>
       <div className="flex justify-center">
-        <Button onClick={handleRetry} className="px-6">
+        <Button onClick={handleRetry} className="px-6 bg-black hover:bg-black/90 text-white">
           Try again
         </Button>
       </div>
@@ -421,7 +425,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
       
       {/* Button with consistent styling */}
       <div className="flex justify-center">
-        <Button onClick={handleRetry} className="px-6">
+        <Button onClick={handleRetry} className="px-6 bg-black hover:bg-black/90 text-white">
           Try again
         </Button>
       </div>
@@ -458,7 +462,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
       </div>
 
       <div className="flex justify-center">
-        <Button onClick={() => setState('upload')} className="px-6">
+        <Button onClick={() => setState('upload')} className="px-6 bg-black hover:bg-black/90 text-white">
           Try again
         </Button>
       </div>
@@ -504,17 +508,15 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
         {state === 'success' && renderSuccessState()}
       </div>
       
-      {/* Powered by DIRO - Branding (hidden on success screen) */}
-      {state !== 'success' && (
-        <div className="flex items-center justify-end gap-1.5 px-6 pb-4">
-          <span className="text-xs text-muted-foreground font-medium">Powered by</span>
-          <img 
-            src="/lovable-uploads/60eda7c0-d9e6-4f77-b30e-985d3c98e69b.png" 
-            alt="DIRO" 
-            className="h-3 opacity-70"
-          />
-        </div>
-      )}
+      {/* Powered by DIRO - Branding */}
+      <div className="flex items-center justify-end gap-1.5 px-6 pb-4">
+        <span className="text-xs text-muted-foreground font-medium">Powered by</span>
+        <img 
+          src="/lovable-uploads/60eda7c0-d9e6-4f77-b30e-985d3c98e69b.png" 
+          alt="DIRO" 
+          className="h-3 opacity-70"
+        />
+      </div>
     </div>
   );
 };

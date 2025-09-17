@@ -1,19 +1,62 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import DiroUploadWidget from '@/components/DiroUploadWidget';
-import fraudnetLogo from '@/assets/fraudnet-logo.png';
+import fraudnetLogo from '@/assets/image (1).png';
+import { uploadSmartFeedback, submitSmartUpload } from '@/services/diro';
+import { env } from '@/config/env';
+// import { toast } from '@/components/ui/use-toast';
 
 const Upload = () => {
 
-  const handleFileUpload = (file: File) => {
-    console.log('File uploaded:', file.name);
+  const lastDocIdRef = useRef<string | null>(null);
+
+  const handleFileUpload = async (file: File) => {
+    try {
+      const res = await uploadSmartFeedback({ file, buttonId: env.diro.defaultButtonId });
+      console.log('rishabh-smartFeedback response:', res);
+      lastDocIdRef.current = res.docid || null;
+      if (lastDocIdRef.current) {
+        console.log('rishabh-smartFeedback docid:', lastDocIdRef.current);
+      }
+      // toast({
+      //   title: 'Document processed',
+      //   description: `Type: ${res.document_type || 'Unknown'} • Doc ID: ${res.docid || '—'}`,
+      // });
+      return res;
+    } catch (err: any) {
+      console.error(err);
+      // toast({
+      //   title: 'Upload failed',
+      //   description: err?.message || 'Something went wrong',
+      //   variant: 'destructive',
+      // });
+      throw err;
+    }
   };
 
   const handleRetry = () => {
     console.log('User clicked retry');
   };
 
-  const handleSubmit = () => {
-    console.log('Form submitted successfully');
+  const handleSubmit = async () => {
+    const docid = lastDocIdRef.current;
+    if (!docid) {
+      // toast({ title: 'No document to submit', description: 'Please upload a document first', variant: 'destructive' });
+      return;
+    }
+    try {
+      const res = await submitSmartUpload(docid);
+      console.log('rishabh-smartUpload response:', res);
+      if (res && res.error === false) {
+        // toast({ title: 'Thank you', description: res.message || 'Document uploaded successfully.' });
+        // DiroUploadWidget will show success via onSubmit callback
+      } else {
+        throw new Error(res?.message || 'Submission failed');
+      }
+    } catch (err: any) {
+      console.error(err);
+      // toast({ title: 'Submit failed', description: err?.message || 'Something went wrong', variant: 'destructive' });
+      throw err; // let widget handle failure state or keep current state
+    }
   };
 
   return (
@@ -21,7 +64,7 @@ const Upload = () => {
       {/* Header */}
       <header className="border-b border-gray-200 py-4 px-8 lg:pl-16">
         <div className="flex items-center">
-          <img src={fraudnetLogo} alt="FraudNet" className="w-[185px] h-[48px]" />
+          <img src={fraudnetLogo} alt="FraudNet" className="h-[48px] w-auto" />
         </div>
       </header>
 
