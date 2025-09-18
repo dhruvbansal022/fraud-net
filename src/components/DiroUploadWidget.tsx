@@ -300,7 +300,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
         onClick={() => fileInputRef.current?.click()}
       >
         <CloudUpload className="w-16 h-16 mx-auto mb-6 text-muted-foreground stroke-1" />
-        <h3 className="text-lg font-semibold mb-2">Upload your {documentType}</h3>
+        <h3 className="text-lg font-semibold mb-2">Upload your {documentType === 'document' ? 'bank document' : documentType}</h3>
         <p className="text-sm text-muted-foreground mb-6">
           Drag and drop your file here.
         </p>
