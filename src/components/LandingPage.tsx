@@ -60,7 +60,7 @@ const LandingPage = () => {
           {/* Center Section - Widget */}
           <div className="lg:col-span-1 flex justify-center">
             <div className="w-full max-w-md">
-              <DiroUploadWidget onFileUpload={handleFileUpload} onRetry={handleRetry} onSubmit={handleSubmit} documentType="document" periodRange="last 3 months" />
+              <DiroUploadWidget onFileUpload={handleFileUpload} onRetry={handleRetry} onSubmit={handleSubmit} documentType="bank document" periodRange="last 3 months" />
             </div>
           </div>
 
