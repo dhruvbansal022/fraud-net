@@ -15,6 +15,7 @@ export type WidgetState =
   | 'document-verified'
   | 'error' 
   | 'unprocessable'
+  | 'invalid-document-type'
   | 'submitting'
   | 'success';
 
@@ -32,6 +33,7 @@ type SmartFeedbackResult = {
   accountnumber_value?: string[];
   period?: string;
   docid?: string;
+  document_type?: string;
   [key: string]: unknown;
 };
 
@@ -186,6 +188,17 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
         maybe instanceof Promise ? await maybe : (maybe as SmartFeedbackResult | void);
       if (!result) {
         // If no result is returned, do not advance to next screen
+        return;
+      }
+
+      // Check if document type is invalid
+      if (result.document_type === "Invalid") {
+        apiDoneRef.current = true;
+        if (progressTimerRef.current) {
+          clearInterval(progressTimerRef.current);
+          progressTimerRef.current = null;
+        }
+        setState('invalid-document-type');
         return;
       }
 
@@ -551,6 +564,23 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
     </div>
   );
 
+  const renderInvalidDocumentTypeState = () => (
+    <div className="text-center">
+      <div className="w-[52px] h-[52px] mx-auto mb-4 bg-error rounded-full flex items-center justify-center">
+        <AlertOctagon className="w-6 h-6 text-white" />
+      </div>
+      <h3 className="text-[18px] font-semibold mb-2">Document type invalid</h3>
+      <p className="text-[16px] text-muted-foreground mb-6">
+        Please upload a valid bank document.
+      </p>
+      <div className="flex justify-center">
+        <Button onClick={handleRetry} className="px-6">
+          Try again
+        </Button>
+      </div>
+    </div>
+  );
+
   const renderSuccessState = () => (
     <div className="text-center">
       <CheckCircle className="w-[52px] h-[52px] mx-auto mb-4 text-success" />
@@ -576,6 +606,7 @@ const DiroUploadWidget: React.FC<DiroUploadWidgetProps> = ({
         {state === 'document-verified' && renderDocumentVerifiedState()}
         {state === 'error' && renderErrorState()}
         {state === 'unprocessable' && renderUnprocessableState()}
+        {state === 'invalid-document-type' && renderInvalidDocumentTypeState()}
         {state === 'submitting' && renderSubmittingState()}
         {state === 'success' && renderSuccessState()}
       </div>
